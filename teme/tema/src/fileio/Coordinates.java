@@ -3,7 +3,11 @@ package fileio;
 public final class Coordinates {
    private int x, y;
 
-   public Coordinates() {
+   public Coordinates() {}
+   // Added coordinates to constructor
+   public Coordinates(int x, int y) {
+      this.x = x;
+      this.y = y;
    }
 
    public int getX() {
