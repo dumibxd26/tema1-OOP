@@ -25,10 +25,8 @@ public class Actions {
     private Map<Coordinates, Player> isFrozen;
     private Set<Coordinates> usedAttack;
 
-    private Map<Coordinates, Integer> posInMatrix;
-
     public Actions(Player playerOne, Player playerTwo, ArrayList<ArrayList<Minion>> playMatrix, int playerTurn,
-                   Map<Coordinates, Player> isFrozen, Set<Coordinates> usedAttack, ObjectMapper mapper, ArrayNode output, Map<Coordinates, Integer> posInMatrix) {
+                   Map<Coordinates, Player> isFrozen, Set<Coordinates> usedAttack, ObjectMapper mapper, ArrayNode output) {
         this.playerOne = playerOne;
         this.playerTwo = playerTwo;
         this.playMatrix = playMatrix;
@@ -37,7 +35,6 @@ public class Actions {
         this.usedAttack = usedAttack;
         this.mapper = mapper;
         this.output = output;
-        this.posInMatrix = posInMatrix;
 //        this.utility = new utility(mapper, output);
 
         currentPlayer = playerTurn == 1 ? playerOne : playerTwo;
@@ -189,10 +186,6 @@ public class Actions {
                             currentPlayer.getHand().remove(index);
                             currentPlayer.setMana(currentPlayer.getMana() - card.getMana());
 
-                            int frontRowNumber = playGame.utility.getFrontRowNumber(playerTurn);
-                            posInMatrix.put(new Coordinates(action.getX(), action.getY()), frontRow.size() - 1);
-
-
                             if(utility.checkIsTank(card)) {
                                 currentPlayer.setTanks(currentPlayer.getTanks() + 1);
                             }
@@ -203,9 +196,6 @@ public class Actions {
                             rearRow.add((Minion) card);
                             currentPlayer.getHand().remove(index);
                             currentPlayer.setMana(currentPlayer.getMana() - card.getMana());
-
-                            int rearRowNumber = playGame.utility.getRearRowNumber(playerTurn);
-                            posInMatrix.put(new Coordinates(action.getX(), action.getY()), frontRow.size() - 1);
 
                             if(utility.checkIsTank(card)) {
                                 currentPlayer.setTanks(currentPlayer.getTanks() + 1);
@@ -225,6 +215,7 @@ public class Actions {
                         Environment environmentCard = (Environment) card;
 
                         environmentCard.useAbility(playMatrix, row);
+
 
                         currentPlayer.getHand().remove(index);
                         currentPlayer.setMana(currentPlayer.getMana() - card.getMana());
@@ -246,11 +237,9 @@ public class Actions {
 
                         attackerCard.attack(attackedCard);
 
-                        if (attackerCard.getHealth() <= 0) {
-                           // int deleteRowPos = utility.getPosInMatrixRow(posInMatrix, attackedCardCoord);
-                          //  playMatrix.get(attackedCardCoord.getX()).remove(deleteRowPos);
-                           // utility.removeFromPosInMatrix(posInMatrix, attackedCardCoord);
-                        }
+//                        if (attackerCard.getHealth() <= 0) {
+//                            playMatrix.get(attackedCardCoord.getX()).remove(attackedCardCoord.getY());
+//                        }
 
                         usedAttack.add(attackerCardCoord);
                     }

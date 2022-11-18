@@ -20,8 +20,6 @@ public class PlayGame {
 
     private Map<Coordinates, Player> isFrozen = new HashMap<Coordinates, Player>();
     private Set<Coordinates> usedAttack = new HashSet<Coordinates>();
-
-    private  Map<Coordinates, Integer> posInMatrix = new HashMap<Coordinates, Integer>();
     public PlayGame(Input playGame, ObjectMapper mapper, ArrayNode output) {
         playerOneDecks = playGame.getPlayerOneDecks();
         playerTwoDecks = playGame.getPlayerTwoDecks();
@@ -77,14 +75,11 @@ public class PlayGame {
            for(int i = 0; i < 4; i++) {
                playMatrix.get(i).clear();
            }
-
-           posInMatrix.clear();
-
            // Add a card in the hand of each user
            playerOne.getHand().add(playerOne.getDeck().remove(0));
            playerTwo.getHand().add(playerTwo.getDeck().remove(0));
 
-           actions = new Actions(playerOne, playerTwo, playMatrix, playerTurn, isFrozen, usedAttack, mapper, output, posInMatrix);
+           actions = new Actions(playerOne, playerTwo, playMatrix, playerTurn, isFrozen, usedAttack, mapper, output);
            ArrayList<ActionsInput> actionsArray = gameInputIterator.getActions();
            actions.executeActions(actionsArray);
        }

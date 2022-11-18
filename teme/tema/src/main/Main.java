@@ -111,12 +111,12 @@ public final class Main {
 
 
         if (filePath1.compareTo("test01_game_start.json") == 0 ||
-                filePath1.compareTo("test02_place_card.json") == 0) {
-//                filePath1.compareTo("test03_place_card_invalid.json") == 0 ||
-//                filePath1.compareTo("test04_use_environment_card.json") == 0 ||
-//                filePath1.compareTo("test05_use_environment_card_invalid.json") == 0 ||
-//               filePath1.compareTo("test06_attack_card.json") == 0 ||
-//                filePath1.compareTo("test07_attack_card_invalid.json") == 0 ) {
+                filePath1.compareTo("test02_place_card.json") == 0 ||
+                filePath1.compareTo("test03_place_card_invalid.json") == 0 ||
+                filePath1.compareTo("test04_use_environment_card.json") == 0 ||
+                filePath1.compareTo("test05_use_environment_card_invalid.json") == 0 ||
+               filePath1.compareTo("test06_attack_card.json") == 0 ||
+                filePath1.compareTo("test07_attack_card_invalid.json") == 0 ) {
             PlayGame playGame = new PlayGame(inputData, objectMapper, output);
             playGame.play();
         }

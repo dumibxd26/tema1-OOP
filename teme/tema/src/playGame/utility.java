@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.*;
 
 import cards.*;
 import cards.Card;
@@ -188,36 +187,8 @@ public class utility {
         return 0;
     }
 
-    public static int getPosInMatrixRow(Map<Coordinates, Integer> posInMatrix, Coordinates set) {
-
-        for (Map.Entry<Coordinates, Integer> entry : posInMatrix.entrySet()) {
-            if(entry.getKey().getX() == set.getX() && entry.getKey().getY() == set.getY()) {
-                return entry.getValue();
-            }
-        }
-        return -1;
-    }
-
-    public static void removeFromPosInMatrix(Map<Coordinates, Integer> posInMatrix, Coordinates set) {
-
-        Iterator<Map.Entry<Coordinates, Integer> >
-                iterator = posInMatrix.entrySet().iterator();
-
-        while (iterator.hasNext()) {
-
-            Map.Entry<Coordinates, Integer>
-                    entry
-                    = iterator.next();
-
-            if (entry.getKey().getX() == set.getX() && entry.getKey().getY() == set.getY()) {
-                iterator.remove();
-                return ;
-            }
-        }
-    }
-
     public static ArrayList<Minion> getFrontRow(int playerTurn, ArrayList<ArrayList<Minion>> playMatrix) {
-            return playMatrix.get(getRearRowNumber(playerTurn));
+            return playMatrix.get(getFrontRowNumber(playerTurn));
     }
 
     public static ArrayList<Minion> getRearRow(int playerTurn, ArrayList<ArrayList<Minion>> playMatrix) {
