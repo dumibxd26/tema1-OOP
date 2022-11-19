@@ -332,9 +332,7 @@ public class Actions {
             if(playerCommand.size() > 0) {
                 output.addAll(Arrays.asList(playerCommand));
             }
-
         }
-
 
     }
 
