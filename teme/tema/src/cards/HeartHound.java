@@ -9,7 +9,6 @@ public class HeartHound extends Environment{
     }
 
     public void useAbility(ArrayList<ArrayList<Minion>> playMatrix, int row) {
-        System.out.println("heart hound");
 
         ArrayList<Minion> otherMinionsRow = playMatrix.get(row);
         int position = 0;

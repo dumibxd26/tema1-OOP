@@ -37,6 +37,8 @@ public class LordRoyce extends Hero {
         } else {
             isFrozen.put(new Coordinates(row, position), playerTwo);
         }
+
+        System.out.println(isFrozen);
     }
 
     public void setIsFrozen( Map<Coordinates, Player> isFrozen) {

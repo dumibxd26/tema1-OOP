@@ -110,17 +110,26 @@ public final class Main {
 //        test18_big_game.json
 
 
-        if (filePath1.compareTo("test01_game_start.json") == 0 ||
-                filePath1.compareTo("test02_place_card.json") == 0 ||
-                filePath1.compareTo("test03_place_card_invalid.json") == 0 ||
-                filePath1.compareTo("test04_use_environment_card.json") == 0 ||
-                filePath1.compareTo("test05_use_environment_card_invalid.json") == 0 ||
-               filePath1.compareTo("test06_attack_card.json") == 0 ||
-                filePath1.compareTo("test07_attack_card_invalid.json") == 0 ) {
+//        if (filePath1.compareTo("test01_game_start.json") == 0 ||
+//                filePath1.compareTo("test02_place_card.json") == 0 ||
+//                filePath1.compareTo("test03_place_card_invalid.json") == 0 ||
+//                filePath1.compareTo("test04_use_environment_card.json") == 0 ||
+//                filePath1.compareTo("test05_use_environment_card_invalid.json") == 0 ||
+//                filePath1.compareTo("test06_attack_card.json") == 0 ||
+//                filePath1.compareTo("test07_attack_card_invalid.json") == 0 ||
+//                filePath1.compareTo("test08_use_card_ability.json") == 0 ||
+//                filePath1.compareTo("test09_use_card_ability_invalid.json") == 0 ||
+//                filePath1.compareTo("test10_attack_hero.json") == 0 ||
+//                filePath1.compareTo("test11_attack_hero_invalid.json") == 0 ||
+//                filePath1.compareTo("test12_use_hero_ability_1.json") == 0  ||
+//                filePath1.compareTo("test13_use_hero_ability_1_invalid.json") == 0 ||
+//                filePath1.compareTo("test14_use_hero_ability_2.json") == 0 ||
+//                filePath1.compareTo("test15_use_hero_ability_2_invalid.json") == 0)
+//        {
+
             PlayGame playGame = new PlayGame(inputData, objectMapper, output);
             playGame.play();
-        }
-
+//        }
 
         ObjectWriter objectWriter = objectMapper.writerWithDefaultPrettyPrinter();
         objectWriter.writeValue(new File(filePath2), output);

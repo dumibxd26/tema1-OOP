@@ -16,8 +16,13 @@ public class CursedOne extends SpecialMinion{
         Minion otherMinion = playMatrix.get(set.getX()).get(set.getY());
 
         int temp = otherMinion.getAttackDamage();
-        otherMinion.setAttackDamage(otherMinion.getHealth());
-        otherMinion.setHealth(temp);
+
+        if (temp == 0) {
+            playMatrix.get(set.getX()).remove(otherMinion);
+        } else {
+            otherMinion.setAttackDamage(otherMinion.getHealth());
+            otherMinion.setHealth(temp);
+        }
     }
 
 }

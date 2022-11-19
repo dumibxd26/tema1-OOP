@@ -2,6 +2,7 @@ package playGame;
 
 import cards.*;
 import cards.Heros.Hero;
+import cards.Heros.LordRoyce;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import fileio.*;
@@ -20,6 +21,10 @@ public class PlayGame {
 
     private Map<Coordinates, Player> isFrozen = new HashMap<Coordinates, Player>();
     private Set<Coordinates> usedAttack = new HashSet<Coordinates>();
+
+    private Wins wins = new Wins(0, 0);
+
+    private int playedGames = 1;
     public PlayGame(Input playGame, ObjectMapper mapper, ArrayNode output) {
         playerOneDecks = playGame.getPlayerOneDecks();
         playerTwoDecks = playGame.getPlayerTwoDecks();
@@ -32,9 +37,6 @@ public class PlayGame {
         }
     }
     public void play() {
-
-        System.out.println(output);
-
         // ia fiecare JOC din array=ul de JOCURI
         // actions este diferit pentru fiecare game,
 
@@ -64,12 +66,19 @@ public class PlayGame {
                                           playerTwoHeroInput.getColors(), playerTwoHeroInput.getName(), 30, isFrozen);
 
            // Initialise heros
-           Player playerOne = new Player(playerOneDeck, playerOneHero, 1);
-           Player playerTwo = new Player(playerTwoDeck, playerTwoHero, 2);
+           Player playerOne = new Player(playerOneDeck, playerOneHero, 1, wins);
+           Player playerTwo = new Player(playerTwoDeck, playerTwoHero, 2, wins);
 
-           // The biggest dog shit
+           // The biggest piece of dog shit
            utility.addIsFrozen(playerOneDeck, playerOne, playerTwo);
            utility.addIsFrozen(playerTwoDeck, playerOne, playerTwo);
+
+           if (playerOne.getHero().getName().compareTo("Lord Royce") == 0) {
+               ((LordRoyce)playerOne.getHero()).setPlayers(playerOne, playerTwo);
+           }
+           if (playerTwo.getHero().getName().compareTo("Lord Royce") == 0) {
+               ((LordRoyce)playerTwo.getHero()).setPlayers(playerTwo, playerTwo);
+           }
 
            // Initialise the matrix of cards for each game
            for(int i = 0; i < 4; i++) {
@@ -79,9 +88,10 @@ public class PlayGame {
            playerOne.getHand().add(playerOne.getDeck().remove(0));
            playerTwo.getHand().add(playerTwo.getDeck().remove(0));
 
-           actions = new Actions(playerOne, playerTwo, playMatrix, playerTurn, isFrozen, usedAttack, mapper, output);
+           actions = new Actions(playerOne, playerTwo, playMatrix, playerTurn, isFrozen, usedAttack, mapper, output, playedGames, wins);
            ArrayList<ActionsInput> actionsArray = gameInputIterator.getActions();
            actions.executeActions(actionsArray);
+           playedGames++;
        }
 
     }

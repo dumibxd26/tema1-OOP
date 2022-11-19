@@ -2,6 +2,7 @@ package cards;
 
 import fileio.CardInput;
 import fileio.Coordinates;
+import playGame.utility;
 
 import java.util.ArrayList;
 
@@ -12,8 +13,10 @@ public class Ripper extends SpecialMinion{
     }
 
     public void useAbility(ArrayList<ArrayList<Minion>> playMatrix, Coordinates set) {
-        Minion otherMinion = playMatrix.get(set.getX()).get(set.getY());
+        Minion otherMinion = utility.getMinionOnTable(playMatrix, set);
 
-        otherMinion.setHealth(otherMinion.getHealth() - 2);
+        if (otherMinion.getAttackDamage() >= 2) {
+            otherMinion.setAttackDamage(otherMinion.getAttackDamage() - 2);
+        }
     }
 }

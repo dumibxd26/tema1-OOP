@@ -9,7 +9,7 @@ public class Minion extends CardWithHealth{
 
     private int attackDamage;
 
-    private int 
+    private int positionOnRow;
 
     public Minion(int mana, String description, ArrayList<String> colors, String name, int health, int attackDamage) {
         super(mana, description, colors, name, health);
@@ -26,6 +26,14 @@ public class Minion extends CardWithHealth{
 
     public void attack(CardWithHealth card) {
         card.setHealth(card.getHealth() - attackDamage);
+    }
+
+    public int getPositionOnRow() {
+        return positionOnRow;
+    }
+
+    public void setPositionOnRow(int positionOnRow) {
+        this.positionOnRow = positionOnRow;
     }
 
     @Override

@@ -123,11 +123,6 @@ public class utility {
 //        }
 //        return -1;
 //    }
-    private static void addError(ObjectMapper mapper, ArrayNode output, String error) {
-        node = mapper.createObjectNode();
-        node.put("error", error);
-        output.add(node);
-    }
 
     private static void addErrorPlaceCard(ActionsInput action, ObjectMapper mapper, ArrayNode output, String error) {
         node = mapper.createObjectNode();
@@ -146,11 +141,32 @@ public class utility {
         output.add(node);
     }
 
-    private static void addErrorAttack(ActionsInput action, ObjectMapper mapper, ArrayNode output, String error) {
+    private static void addErrorUseCard(ActionsInput action, ObjectMapper mapper, ArrayNode output, String error, int command) {
         node = mapper.createObjectNode();
-        node.put("command", "cardUsesAttack");
+        if (command == 1) {
+            node.put("command", "cardUsesAttack");
+        } else {
+            node.put("command", "cardUsesAbility");
+        }
+
         node.put("cardAttacker", utilsOutput.createCoordinates(mapper, action.getCardAttacker()));
         node.put("cardAttacked", utilsOutput.createCoordinates(mapper, action.getCardAttacked()));
+        node.put("error", error);
+        output.add(node);
+    }
+
+    private static void addErrorAtkHero(ActionsInput action, ObjectMapper mapper, ArrayNode output, String error) {
+        node = mapper.createObjectNode();
+        node.put("command", "useAttackHero");
+        node.put("cardAttacker", utilsOutput.createCoordinates(mapper, action.getCardAttacker()));
+        node.put("error", error);
+        output.add(node);
+    }
+
+    private static void addErrorAbilityHero(ActionsInput action, ObjectMapper mapper, ArrayNode output, String error) {
+        node = mapper.createObjectNode();
+        node.put("command", "useHeroAbility");
+        node.put("affectedRow", action.getAffectedRow());
         node.put("error", error);
         output.add(node);
     }
@@ -171,7 +187,6 @@ public class utility {
                 card.getName().compareTo("Goliath") == 0 ||
                 card.getName().compareTo("Warden") == 0);
     }
-
 
     public static int getFrontRowNumber(int playerTurn) {
         if(playerTurn == 1) {
@@ -281,13 +296,9 @@ public class utility {
         return !checkBelongsToEnemy(currentPlayer, attackedCardCoord);
     }
 
-    public static Boolean checkHeroAttacked(Hero hero) {
-        return !hero.getAttackedThisTurn();
-    }
-
     public static Boolean checkHasToApplyOwnRow(Hero hero) {
-        return (hero.getName().compareTo("Lord Royce") == 0 ||
-                hero.getName().compareTo("Empress ") == 0);
+        return (hero.getName().compareTo("King Mudface") == 0 ||
+                hero.getName().compareTo("General Kocioraw") == 0);
     }
 
     public static Boolean checkCardAtPosition(ArrayList<ArrayList<Minion>> playMatrix, Coordinates set) {
@@ -323,15 +334,6 @@ public class utility {
            return false;
        }
        return true;
-    }
-
-    public static Boolean checkHeroMana(ObjectMapper mapper, ArrayNode output, Card card, Player player) {
-        if (player.getMana() < card.getMana()) {
-
-            addError(mapper, output, "Not enough mana to use hero's ability.");
-            return false;
-        }
-        return true;
     }
 
 
@@ -370,44 +372,115 @@ public class utility {
         return true;
     }
 
-    public static Boolean checkAttackBelongsToEnemy(ActionsInput action, ObjectMapper mapper, ArrayNode output, Player currentPlayer, Coordinates attackedCardCoord) {
+    public static Boolean checkUseCardBelongsToEnemy(ActionsInput action, ObjectMapper mapper, ArrayNode output, Player currentPlayer, Coordinates attackedCardCoord, int command) {
 
         if (!checkBelongsToEnemy(currentPlayer, attackedCardCoord)) {
-            addErrorAttack(action, mapper, output, "Attacked card does not belong to the enemy.");
+            addErrorUseCard(action, mapper, output, "Attacked card does not belong to the enemy.", command);
             return false;
         }
         return true;
     }
 
-    public static Boolean checkAtkAttackedThisTurn(ActionsInput action, ObjectMapper mapper, ArrayNode output, Set<Coordinates> usedAttack, Coordinates attackerCardCoord) {
+    public static Boolean checkUseCardBelongsToCurrent(ActionsInput action, ObjectMapper mapper, ArrayNode output, Player currentPlayer, Coordinates attackedCardCoord, int command) {
 
-        System.out.println(usedAttack + " and " +  attackerCardCoord + " aaand " + checkAttackedThisTurn(usedAttack, attackerCardCoord));
+        if (checkBelongsToEnemy(currentPlayer, attackedCardCoord)) {
+            addErrorUseCard(action, mapper, output, "Attacked card does not belong to the current player.", command);
+            return false;
+        }
+        return true;
+    }
+
+    public static Boolean checkUseCardAtkAttackedThisTurn(ActionsInput action, ObjectMapper mapper, ArrayNode output, Set<Coordinates> usedAttack, Coordinates attackerCardCoord, int command) {
+
         if (checkAttackedThisTurn(usedAttack, attackerCardCoord)) {
-            addErrorAttack(action, mapper, output, "Attacker card has already attacked this turn.");
+            addErrorUseCard(action, mapper, output, "Attacker card has already attacked this turn.", command);
             return false;
         }
         return true;
     }
 
-    public static Boolean checkAttackFrozen(ActionsInput action, ObjectMapper mapper, ArrayNode output,  Map<Coordinates, Player> isFrozen, Coordinates attackerCardCoord) {
+    public static Boolean checkUsecardAttackFrozen(ActionsInput action, ObjectMapper mapper, ArrayNode output,  Map<Coordinates, Player> isFrozen, Coordinates attackerCardCoord, int command) {
 
-       // System.out.println(isFrozen + " asdsa " + attackerCardCoord + " pulamea " + checkFrozen(isFrozen, attackerCardCoord));
         if (checkFrozen(isFrozen, attackerCardCoord)) {
-            addErrorAttack(action, mapper, output, "Attacker card is frozen.");
+            addErrorUseCard(action, mapper, output, "Attacker card is frozen.", command);
             return false;
         }
         return true;
     }
 
-    public static Boolean checkTankCardAttack(ActionsInput action, ObjectMapper mapper, ArrayNode output, ArrayList<ArrayList<Minion>> playMatrix, Player otherPlayer, Minion attackedCard) {
+    public static Boolean checkUseCardTankCard(ActionsInput action, ObjectMapper mapper, ArrayNode output, ArrayList<ArrayList<Minion>> playMatrix, Player otherPlayer, Minion attackedCard, int command) {
         if (!checkIsTank(attackedCard)) {
 
             if (checkTankOnTable(playMatrix, otherPlayer)) {
-                addErrorAttack(action, mapper, output, "Attacked card is not of type 'Tank’.");
+                addErrorUseCard(action, mapper, output, "Attacked card is not of type 'Tank'.", command);
                 return false;
             }
-
             return true;
+        }
+        return true;
+    }
+
+    public static Boolean checkHeroAtkFrozen(ActionsInput action, ObjectMapper mapper, ArrayNode output,  Map<Coordinates, Player> isFrozen, Coordinates attackerCardCoord) {
+        if (checkFrozen(isFrozen, attackerCardCoord)) {
+            addErrorAtkHero(action, mapper, output, "Attacker card is frozen.");
+            return false;
+        }
+        return true;
+    }
+
+    public static Boolean checkHeroAtkAttackedThisTurn(ActionsInput action, ObjectMapper mapper, ArrayNode output, Set<Coordinates> usedAttack, Coordinates attackerCardCoord) {
+
+        if (checkAttackedThisTurn(usedAttack, attackerCardCoord)) {
+            addErrorAtkHero(action, mapper, output, "Attacker card has already attacked this turn.");
+            return false;
+        }
+        return true;
+    }
+
+    public static Boolean checkHeroAtkTankOnTable(ActionsInput action, ObjectMapper mapper, ArrayNode output, ArrayList<ArrayList<Minion>> playMatrix, Player otherPlayer) {
+        if (hasTanks(otherPlayer)) {
+
+            if (checkTankOnTable(playMatrix, otherPlayer)) {
+                addErrorAtkHero(action, mapper, output, "Attacked card is not of type 'Tank'.");
+                return false;
+            }
+            return true;
+        }
+        return true;
+    }
+
+    public static Boolean checkHeroMana(ActionsInput action, ObjectMapper mapper, ArrayNode output, Card card, Player player) {
+        if (player.getMana() < card.getMana()) {
+
+            addErrorAbilityHero(action, mapper, output, "Not enough mana to use hero's ability.");
+            return false;
+        }
+        return true;
+    }
+
+    public static Boolean checkHeroAttacked(ActionsInput action, ObjectMapper mapper, ArrayNode output, Hero hero) {
+        if (hero.getAttackedThisTurn()) {
+
+            addErrorAbilityHero(action, mapper, output, "Hero has already attacked this turn.");
+            return false;
+        }
+        return true;
+    }
+
+    public static Boolean checkHeroAbilityOtherPlayerRow(ActionsInput action, ObjectMapper mapper, ArrayNode output, Player currentPlayer, int row) {
+        if (!checkOtherPlayerRow(currentPlayer, row)) {
+
+            addErrorAbilityHero(action, mapper, output, "Selected row does not belong to the enemy.");
+            return false;
+        }
+        return true;
+    }
+
+    public static Boolean checkHeroAbilityOwnPlayerRow(ActionsInput action, ObjectMapper mapper, ArrayNode output, Player currentPlayer, int row) {
+        if (checkOtherPlayerRow(currentPlayer, row)) {
+
+            addErrorAbilityHero(action, mapper, output, "Selected row does not belong to the current player.");
+            return false;
         }
         return true;
     }

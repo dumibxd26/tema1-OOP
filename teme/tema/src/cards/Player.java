@@ -1,5 +1,6 @@
 package cards;
 
+import playGame.Wins;
 import cards.Heros.Hero;
 import fileio.Coordinates;
 
@@ -13,14 +14,15 @@ public class Player {
     private ArrayList<Card> hand = new ArrayList<Card>();
     private Hero hero;
     private int playerNumber;
-    private int wins = 0;
+    private Wins wins;
     private int mana = 1;
     private int tanks = 0;
 
-    public Player(ArrayList<Card> deck, Hero hero, int playerNumber) {
+    public Player(ArrayList<Card> deck, Hero hero, int playerNumber, Wins wins) {
         this.deck = deck;
         this.hero = hero;
         this.playerNumber = playerNumber;
+        this.wins = wins;
     }
 
     public ArrayList<Card> getDeck() {
@@ -47,11 +49,11 @@ public class Player {
         this.hero = hero;
     }
 
-    public int getWins() {
+    public Wins getWins() {
         return wins;
     }
 
-    public void setWins(int wins) {
+    public void setWins(Wins wins) {
         this.wins = wins;
     }
 

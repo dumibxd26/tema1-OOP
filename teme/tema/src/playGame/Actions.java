@@ -25,8 +25,12 @@ public class Actions {
     private Map<Coordinates, Player> isFrozen;
     private Set<Coordinates> usedAttack;
 
+    private int playedGames;
+
+    private Wins wins;
+
     public Actions(Player playerOne, Player playerTwo, ArrayList<ArrayList<Minion>> playMatrix, int playerTurn,
-                   Map<Coordinates, Player> isFrozen, Set<Coordinates> usedAttack, ObjectMapper mapper, ArrayNode output) {
+                   Map<Coordinates, Player> isFrozen, Set<Coordinates> usedAttack, ObjectMapper mapper, ArrayNode output, int playedGames, Wins wins) {
         this.playerOne = playerOne;
         this.playerTwo = playerTwo;
         this.playMatrix = playMatrix;
@@ -35,6 +39,8 @@ public class Actions {
         this.usedAttack = usedAttack;
         this.mapper = mapper;
         this.output = output;
+        this.playedGames = playedGames;
+        this.wins = wins;
 //        this.utility = new utility(mapper, output);
 
         currentPlayer = playerTurn == 1 ? playerOne : playerTwo;
@@ -128,31 +134,38 @@ public class Actions {
                 playerCommand.put("output", utilsOutput.createFrozenCards(mapper, playMatrix, isFrozen));
             } else if (action.getCommand().compareTo("getTotalGamesPlayed") == 0) {
                 playerCommand.put("command", action.getCommand());
-                playerCommand.put("output", turns);
+                playerCommand.put("output", playedGames);
 
             } else if (action.getCommand().compareTo("getPlayerOneWins") == 0) {
                 playerCommand.put("command", action.getCommand());
-                playerCommand.put("output", playerOne.getWins());
+               // System.out.println(playerTwo.getWins());
+                playerCommand.put("output", playerOne.getWins().getPlayerOneWins());
+
             } else if (action.getCommand().compareTo("getPlayerTwoWins") == 0) {
                 playerCommand.put("command", action.getCommand());
-                playerCommand.put("output", playerTwo.getWins());
-            } else if (action.getCommand().compareTo("endPlayerTurn") == 0) {
-                playerTurn = (playerTurn == 1) ? 2 : 1;
+             //   System.out.println(playerTwo.getWins());
+                playerCommand.put("output", playerTwo.getWins().getPlayerTwoWins());
 
+            } else if (action.getCommand().compareTo("endPlayerTurn") == 0) {
+
+                Iterator<Map.Entry<Coordinates, Player> >
+                        iterator = isFrozen.entrySet().iterator();
+
+                while (iterator.hasNext()) {
+
+                    Map.Entry<Coordinates, Player> entry = iterator.next();
+
+                    if(entry.getValue() == currentPlayer) {
+                        iterator.remove();
+                    }
+                }
+
+                currentPlayer.getHero().setAttackedThisTurn(false);
+
+                playerTurn = (playerTurn == 1) ? 2 : 1;
                 turns++;
                 if(turns != 0 && turns % 2 == 0) {
 
-                    Iterator<Map.Entry<Coordinates, Player> >
-                            iterator = isFrozen.entrySet().iterator();
-
-                    while (iterator.hasNext()) {
-
-                        Map.Entry<Coordinates, Player> entry = iterator.next();
-
-                        if(entry.getValue() == currentPlayer) {
-                            iterator.remove();
-                        }
-                    }
                     if (!playerOne.getDeck().isEmpty()) {
                         playerOne.getHand().add(playerOne.getDeck().remove(0));
                     }
@@ -185,6 +198,7 @@ public class Actions {
                             frontRow.add((Minion) card);
                             currentPlayer.getHand().remove(index);
                             currentPlayer.setMana(currentPlayer.getMana() - card.getMana());
+//                            ((Minion)card).setPositionOnRow(action.getY());
 
                             if(utility.checkIsTank(card)) {
                                 currentPlayer.setTanks(currentPlayer.getTanks() + 1);
@@ -196,6 +210,7 @@ public class Actions {
                             rearRow.add((Minion) card);
                             currentPlayer.getHand().remove(index);
                             currentPlayer.setMana(currentPlayer.getMana() - card.getMana());
+//                            ((Minion)card).setPositionOnRow(action.getY());
 
                             if(utility.checkIsTank(card)) {
                                 currentPlayer.setTanks(currentPlayer.getTanks() + 1);
@@ -216,7 +231,6 @@ public class Actions {
 
                         environmentCard.useAbility(playMatrix, row);
 
-
                         currentPlayer.getHand().remove(index);
                         currentPlayer.setMana(currentPlayer.getMana() - card.getMana());
                     }
@@ -226,20 +240,20 @@ public class Actions {
                 Coordinates attackedCardCoord = action.getCardAttacked();
                 Coordinates attackerCardCoord = action.getCardAttacker();
 
-                if (utility.checkAttackBelongsToEnemy(action, mapper, output, currentPlayer, attackedCardCoord) &&
-                        utility.checkAtkAttackedThisTurn(action, mapper, output, usedAttack, attackerCardCoord) &&
-                        utility.checkAttackFrozen(action, mapper, output, isFrozen, attackerCardCoord)) {
+                if (utility.checkUseCardBelongsToEnemy(action, mapper, output, currentPlayer, attackedCardCoord, 1) &&
+                        utility.checkUseCardAtkAttackedThisTurn(action, mapper, output, usedAttack, attackerCardCoord, 1) &&
+                        utility.checkUsecardAttackFrozen(action, mapper, output, isFrozen, attackerCardCoord, 1)) {
 
                     Minion attackedCard = utility.getMinionOnTable(playMatrix, attackedCardCoord);
                     Minion attackerCard = utility.getMinionOnTable(playMatrix, attackerCardCoord);
 
-                    if (utility.checkTankCardAttack(action, mapper, output, playMatrix, otherPlayer, attackedCard)) {
+                    if (utility.checkUseCardTankCard(action, mapper, output, playMatrix, otherPlayer, attackedCard, 1)) {
 
                         attackerCard.attack(attackedCard);
 
-//                        if (attackerCard.getHealth() <= 0) {
-//                            playMatrix.get(attackedCardCoord.getX()).remove(attackedCardCoord.getY());
-//                        }
+                        if (attackedCard.getHealth() <= 0) {
+                            playMatrix.get(attackedCardCoord.getX()).remove(attackedCard);
+                        }
 
                         usedAttack.add(attackerCardCoord);
                     }
@@ -247,40 +261,48 @@ public class Actions {
             } else if (action.getCommand().compareTo("cardUsesAbility") == 0) {
 
                 Coordinates attackedCardCoord = action.getCardAttacked();
-                Coordinates attackerCardCoord = action.getCardAttacked();
+                Coordinates attackerCardCoord = action.getCardAttacker();
 
-//                Minion attackedCard = utility.getMinionOnTable(playMatrix, attackedCardCoord);
-//                Minion attackerCard = utility.getMinionOnTable(playMatrix, attackerCardCoord);
-
-                if (    utility.checkAttackedThisTurn(usedAttack, attackerCardCoord) &&
-                        utility.checkFrozen(isFrozen, attackerCardCoord)) {
+                if (    utility.checkUsecardAttackFrozen(action, mapper, output, isFrozen, attackerCardCoord, 2)  &&
+                        utility.checkUseCardAtkAttackedThisTurn(action, mapper, output, usedAttack, attackerCardCoord, 2)
+                        ) {
 
                     Minion attackedCard = utility.getMinionOnTable(playMatrix, attackedCardCoord);
                     Minion attackerCard = utility.getMinionOnTable(playMatrix, attackerCardCoord);
 
-//                    if (attackerCard.getName().compareTo("Disciple") == 0 &&
-//                            utility.checkBelongsToCurrent(currentPlayer, attackedCardCoord)) {
-//                            SpecialMinion attackerMinion = (SpecialMinion) attackedCard;
-//                            attackerMinion.useAbility(playMatrix, attackedCardCoord);
-//                    } else if (utility.checkBelongsToEnemy(otherPlayer, attackedCardCoord) &&
-//                            utility.checkTankCardAttack(playMatrix, otherPlayer, attackedCard)){
-//                        SpecialMinion attackerMinion = (SpecialMinion) attackedCard;
-//                        attackerMinion.useAbility(playMatrix, attackedCardCoord);
-//                    }
+                    if (attackerCard.getName().compareTo("Disciple") == 0) {
+                        if (utility.checkUseCardBelongsToCurrent(action, mapper, output, currentPlayer, attackedCardCoord, 2)) {
+                            SpecialMinion attackerMinion = (SpecialMinion) attackerCard;
+                            attackerMinion.useAbility(playMatrix, attackedCardCoord);
+                            usedAttack.add(attackerCardCoord);
+                        }
+                    } else if (utility.checkUseCardBelongsToEnemy(action, mapper, output, currentPlayer, attackedCardCoord, 2) &&
+                            utility.checkUseCardTankCard(action, mapper, output, playMatrix, otherPlayer, attackedCard, 2)){
+                        SpecialMinion attackerMinion = (SpecialMinion) attackerCard;
+                        attackerMinion.useAbility(playMatrix, attackedCardCoord);
+                        usedAttack.add(attackerCardCoord);
+                    }
                 }
             } else if (action.getCommand().compareTo("useAttackHero") == 0) {
 
-                Coordinates attackerCardCoord = action.getCardAttacked();
+                Coordinates attackerCardCoord = action.getCardAttacker();
 
-                if (utility.checkFrozen(isFrozen, attackerCardCoord) &&
-                    utility.checkAttackedThisTurn(usedAttack, attackerCardCoord) &&
-                    utility.checkTankOnTable(playMatrix, otherPlayer)) {
+                if (utility.checkHeroAtkFrozen(action, mapper, output, isFrozen, attackerCardCoord) &&
+                    utility.checkHeroAtkAttackedThisTurn(action, mapper, output, usedAttack, attackerCardCoord) &&
+                    utility.checkHeroAtkTankOnTable(action, mapper, output, playMatrix, otherPlayer)) {
 
                     Minion attackerCard = utility.getMinionOnTable(playMatrix, attackerCardCoord);
                     attackerCard.attack(otherPlayer.getHero());
+                    usedAttack.add(attackerCardCoord);
 
                     if(otherPlayer.getHero().getHealth() <= 0) {
-                        break;
+                        if (currentPlayer.getPlayerNumber() == 1) {
+                            playerOne.getWins().setPlayerOneWins(playerOne.getWins().getPlayerOneWins() + 1);
+                            playerCommand.put("gameEnded","Player one killed the enemy hero.");
+                        } else {
+                            playerTwo.getWins().setPlayerTwoWins(playerTwo.getWins().getPlayerTwoWins() + 1);
+                            playerCommand.put("gameEnded","Player two killed the enemy hero.");
+                        }
                     }
                 }
             } else if (action.getCommand().compareTo("useHeroAbility") == 0) {
@@ -288,29 +310,29 @@ public class Actions {
                 int row = action.getAffectedRow();
                 Hero hero = currentPlayer.getHero();
 
-                if (utility.checkHeroMana(mapper, output, hero, currentPlayer) && utility.checkHeroAttacked(hero)) {
+                if (utility.checkHeroMana(action, mapper, output, hero, currentPlayer) &&
+                        utility.checkHeroAttacked(action, mapper, output, hero)) {
 
                     if (utility.checkHasToApplyOwnRow(hero)) {
-                        if (!utility.checkOtherPlayerRow(currentPlayer, row)) {
+                        if (utility.checkHeroAbilityOwnPlayerRow(action, mapper, output, currentPlayer, row)) {
                             hero.useAbility(playMatrix, row);
+                            hero.setAttackedThisTurn(true);
+                            currentPlayer.setMana(currentPlayer.getMana() - hero.getMana());
                         }
                     } else {
-                        if (utility.checkOtherPlayerRow(currentPlayer, row)) {
+                        if (utility.checkHeroAbilityOtherPlayerRow(action, mapper, output, currentPlayer, row)) {
                             hero.useAbility(playMatrix, row);
+                            hero.setAttackedThisTurn(true);
+                            currentPlayer.setMana(currentPlayer.getMana() - hero.getMana());
                         }
                     }
                 }
             }
-           // System.out.println(playerCommand);
+
             if(playerCommand.size() > 0) {
                 output.addAll(Arrays.asList(playerCommand));
             }
-    //        if (action.getCommand().compareTo("endPlayerTurn") == 0)
-//            if (currentPlayer == playerOne) {
-//                System.out.println("PULAMEA");
-//                System.out.println(currentPlayer.getDeck().size());
-//            }
-//            System.out.println(output);
+
         }
 
 

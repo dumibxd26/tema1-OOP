@@ -16,10 +16,11 @@ public class Miraj extends SpecialMinion {
     public void useAbility(ArrayList<ArrayList<Minion>> playMatrix, Coordinates set) {
 
         Minion otherPlayer = utility.getMinionOnTable(playMatrix, set);
-        int currentLife = this.getHealth();
+        int currentHealth = this.getHealth();
 
         this.setHealth(otherPlayer.getHealth());
-        otherPlayer.setHealth(currentLife);
+        otherPlayer.setHealth(currentHealth);
+
     }
 
 }
