@@ -75,6 +75,7 @@ public final class Main {
         //TODO add here the entry point to your implementation
             PlayGame playGame = new PlayGame(inputData, objectMapper, output);
             playGame.play();
+            // Main problem
 
         ObjectWriter objectWriter = objectMapper.writerWithDefaultPrettyPrinter();
         objectWriter.writeValue(new File(filePath2), output);
