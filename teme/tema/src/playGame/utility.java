@@ -301,9 +301,13 @@ public class utility {
                 hero.getName().compareTo("General Kocioraw") == 0);
     }
 
-    public static Boolean checkCardAtPosition(ArrayList<ArrayList<Minion>> playMatrix, Coordinates set) {
+    public static Boolean checkCardAtPosition(ObjectNode commandNode, ArrayList<ArrayList<Minion>> playMatrix, Coordinates set) {
 
-        return playMatrix.get(set.getX()).size() > set.getY();
+        if (playMatrix.get(set.getX()).size() <= set.getY()) {
+            commandNode.put("output", "No card available at that position.");
+            return false;
+        }
+        return true;
     }
 
     public static ArrayList<Environment> filterEnv(ArrayList<Card> hand) {

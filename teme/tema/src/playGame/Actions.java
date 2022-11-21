@@ -95,9 +95,11 @@ public class Actions {
 
             } else if (action.getCommand().compareTo("getCardAtPosition") == 0) {
                 playerCommand.put("command", action.getCommand());
+                playerCommand.put("x", action.getX());
+                playerCommand.put("y", action.getY());
                 Coordinates set = new Coordinates(action.getX(), action.getY());
 
-                if (utility.checkCardAtPosition(playMatrix, set)){
+                if (utility.checkCardAtPosition(playerCommand, playMatrix, set)){
                     playerCommand.put("output", utilsOutput.createMinion(mapper, utility.getMinionOnTable(playMatrix, set)));
                 }
 
