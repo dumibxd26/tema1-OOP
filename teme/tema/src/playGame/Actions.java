@@ -62,7 +62,6 @@ public class Actions {
 
                 if(action.getPlayerIdx() == 1) {
                     playerCommand.put("output", utilsOutput.createDeck(mapper, playerOne.getDeck()));
-                    System.out.println(playerOne.getDeck().size());
                 } else {
                     playerCommand.put("output", utilsOutput.createDeck(mapper, playerTwo.getDeck()));
                 }
@@ -140,12 +139,10 @@ public class Actions {
 
             } else if (action.getCommand().compareTo("getPlayerOneWins") == 0) {
                 playerCommand.put("command", action.getCommand());
-               // System.out.println(playerTwo.getWins());
                 playerCommand.put("output", playerOne.getWins().getPlayerOneWins());
 
             } else if (action.getCommand().compareTo("getPlayerTwoWins") == 0) {
                 playerCommand.put("command", action.getCommand());
-             //   System.out.println(playerTwo.getWins());
                 playerCommand.put("output", playerTwo.getWins().getPlayerTwoWins());
 
             } else if (action.getCommand().compareTo("endPlayerTurn") == 0) {

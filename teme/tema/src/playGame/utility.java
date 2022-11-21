@@ -325,7 +325,6 @@ public class utility {
     public static ArrayList<Minion> getFrozenCards( Map<Coordinates, Player> isFrozen, ArrayList<ArrayList<Minion>> playMatrix) {
 
         ArrayList<Minion> frozenCard = new ArrayList<Minion>();
-     //   System.out.println("are frozen: " + isFrozen.size());
         for (Map.Entry<Coordinates, Player> entry : isFrozen.entrySet()) {
             frozenCard.add(getMinionOnTable(playMatrix, entry.getKey()));
         }
