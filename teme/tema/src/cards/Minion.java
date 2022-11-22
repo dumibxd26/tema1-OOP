@@ -39,12 +39,12 @@ public class Minion extends CardWithHealth{
     @Override
     public String toString() {
         return "{" +
-                "mana=" + mana  +
+                "mana=" + this.getMana()  +
                 ", attackDamage=" + attackDamage +
                 ", health=" + health +
-                ", description='" + description +
-                ", colors=" + colors +
-                ", name='" + name +
+                ", description='" + this.getDescription() +
+                ", colors=" + this.getColors() +
+                ", name='" + this.getName() +
                 '}';
     }
 }

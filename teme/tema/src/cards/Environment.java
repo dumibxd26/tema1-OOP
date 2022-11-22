@@ -16,10 +16,10 @@ public abstract class Environment extends Card{
     @Override
     public String toString() {
         return "{" +
-                "mana=" + mana +
-                ", description='" + description + '\'' +
-                ", colors=" + colors +
-                ", name='" + name + '\'' +
+                "mana=" + this.getMana() +
+                ", description='" + this.getDescription() + '\'' +
+                ", colors=" + this.getColors() +
+                ", name='" + this.getName() + '\'' +
                 '}';
     }
 }

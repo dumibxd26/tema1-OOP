@@ -1,14 +1,12 @@
 package cards;
 
-import fileio.CardInput;
-
 import java.util.ArrayList;
 
 public abstract class Card {
-    public int mana;
-    public String description;
-    public ArrayList<String> colors;
-    public String name;
+    private final int mana;
+    private final String description;
+    private final ArrayList<String> colors;
+    private final String name;
 
     public Card(int mana, String description, ArrayList<String> colors, String name) {
         this.mana = mana;

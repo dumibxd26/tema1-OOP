@@ -26,10 +26,10 @@ public abstract class Hero extends CardWithHealth {
     @Override
     public String toString() {
         return "{" +
-                "mana" + mana +
-                ", description'" + description + '\'' +
-                ", colors" + colors +
-                ", name'" + name + '\'' +
+                "mana" + this.getMana() +
+                ", description'" + this.getDescription() + '\'' +
+                ", colors" + this.getColors() +
+                ", name'" + this.getName()+ '\'' +
                 ", health" + health +
                 '}';
     }
